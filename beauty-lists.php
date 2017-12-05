@@ -23,12 +23,23 @@ function add_beauty_list()
 function add_beauty_list_in_form($post, $metabox)
 {
     $maxListElements = 10;
+    echo '<style>
+            .list-elem-container {width:45%;}
+            .list-elem-container input, .list-elem-container label {display:block;}
+            .list-elem-container .content-input {width:100%;height:100px;}
+            .list-elem-container .right {float:right;}
+            .list-elem-container .right {float:left;}
+        </style>';
     for ($i=0;$i<$maxListElements;$i++) {
+        $elemPosition = ($i%2==0)?"right":"left";
         echo '
-        <div class="list-elem-container">
-            <input type="text" name="list_elem_title_'.$i.'" id="list_elem_title_'.$i.'" />
-            <input type="textarea" name="list_elem_content_'.$i.'" id="list_elem_content_'.$i.'" />
-            <input type="text" name="list_elem_image_'.$i.'" id="list_elem_title_'.$i.'"/>
+        <div class="list-elem-container '.$elemPosition.'" >
+            <label for="list_elem_title_'.$i.'" class="list-label">Título</label>
+            <input type="text" name="list_elem_title_'.$i.'" id="list_elem_title_'.$i.'" class="title-input" />
+            <label for="list_elem_content_'.$i.'" class="list-label">Contenido</label>
+            <input type="textarea" name="list_elem_content_'.$i.'" id="list_elem_content_'.$i.'" class="content-input" />
+            <label for="list_elem_image_'.$i.'" class="list-label">URL de la imagen</label>
+            <input type="text" name="list_elem_image_'.$i.'" id="list_elem_image_'.$i.'" class="image-intput" />
         </div>';
     }
 }
