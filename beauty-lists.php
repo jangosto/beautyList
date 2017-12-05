@@ -24,16 +24,19 @@ function add_beauty_list_in_form($post, $metabox)
 {
     $maxListElements = 10;
     echo '<style>
-            .list-elem-container {width:45%;}
+            #beauty_list .inside {overflow:auto;}
+            .list-elem-container {width:45%;margin-top:10px;margin-bottom:10px;border-style:dotted;padding:10px 10px 10px 10px;}
             .list-elem-container input, .list-elem-container label {display:block;}
-            .list-elem-container .content-input {width:100%;height:100px;}
-            .list-elem-container .right {float:right;}
-            .list-elem-container .right {float:left;}
+            .list-elem-container input {width:90%;}
+            .list-elem-container .content-input {width:90%;height:100px;}
+            .list-elem-container.right {float:right;}
+            .list-elem-container.left {float:left;}
         </style>';
     for ($i=0;$i<$maxListElements;$i++) {
-        $elemPosition = ($i%2==0)?"right":"left";
+        $elemPosition = (($i+1)%2==0)?"right":"left";
         echo '
         <div class="list-elem-container '.$elemPosition.'" >
+            <h2>Elemento '.($i+1).'</h2>
             <label for="list_elem_title_'.$i.'" class="list-label">Título</label>
             <input type="text" name="list_elem_title_'.$i.'" id="list_elem_title_'.$i.'" class="title-input" />
             <label for="list_elem_content_'.$i.'" class="list-label">Contenido</label>
