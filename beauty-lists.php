@@ -22,64 +22,207 @@ function add_beauty_list()
 
 function add_beauty_list_in_form($post, $metabox)
 {
+    wp_nonce_field(basename(__FILE__), "meta-box-nonce");
+
     $maxListElements = 10;
     echo '<style>
             #beauty_list .inside {overflow:auto;}
-            .list-elem-container {width:45%;margin-top:10px;margin-bottom:10px;border-style:dotted;padding:10px 10px 10px 10px;}
-            .list-elem-container input, .list-elem-container label {display:block;}
-            .list-elem-container input {width:90%;}
-            .list-elem-container .content-input {width:90%;height:100px;}
-            .list-elem-container.right {float:right;}
-            .list-elem-container.left {float:left;}
+            #beauty_list .list-elem-container {width:45%;margin-top:10px;margin-bottom:10px;border-style:dotted;padding:10px 10px 10px 10px;}
+            #beauty_list .list-elem-container .input, .list-elem-container label {display:block;}
+            #beauty_list .list-elem-container .input {width:100%;}
+            #beauty_list .list-elem-container.right {float:right;}
+            #beauty_list .list-elem-container.left {float:left;}
+            #beauty_list .info-container {text-align:center;border-style:dotted; padding:10px 10px 10px 10px;}
         </style>';
+    echo '
+        <div class="info-container">
+            Añade el código <strong>[-- beauty_list --]</strong> en el lugar donde quieres que se pinte esta lista.
+        </div>
+    ';
     for ($i=0;$i<$maxListElements;$i++) {
+        $metadataValues = getMetaValues($post, array("list_elem_title_".$i, "list_elem_content_".$i, "list_elem_image_".$i));
         $elemPosition = (($i+1)%2==0)?"right":"left";
         echo '
         <div class="list-elem-container '.$elemPosition.'" >
             <h2>Elemento '.($i+1).'</h2>
             <label for="list_elem_title_'.$i.'" class="list-label">Título</label>
-            <input type="text" name="list_elem_title_'.$i.'" id="list_elem_title_'.$i.'" class="title-input" />
+            <input type="text" name="list_elem_title_'.$i.'" id="list_elem_title_'.$i.'" class="title-input input" value="'.$metadataValues["list_elem_title_".$i].'" />
             <label for="list_elem_content_'.$i.'" class="list-label">Contenido</label>
-            <input type="textarea" name="list_elem_content_'.$i.'" id="list_elem_content_'.$i.'" class="content-input" />
+            <textarea name="list_elem_content_'.$i.'" id="list_elem_content_'.$i.'" class="content-input input" rows="5" value="'.$metadataValues["list_elem_content_".$i].'" >'.$metadataValues["list_elem_content_".$i].'</textarea>
             <label for="list_elem_image_'.$i.'" class="list-label">URL de la imagen</label>
-            <input type="text" name="list_elem_image_'.$i.'" id="list_elem_image_'.$i.'" class="image-intput" />
+            <input type="text" name="list_elem_image_'.$i.'" id="list_elem_image_'.$i.'" class="image-intput input" value="'.$metadataValues["list_elem_image_".$i].'" />
         </div>';
     }
 }
 
-/*function buildListInterface($post, $metabox)
+function getMetaValues($post, $metadataNames)
 {
-    echo '
-    <div id="list-prototype" hidden>
-        <div id="beauty_list_element_[--list_counter--]>" class="postbox">
-            <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Alternar panel: [--list_title--]</span><span class="toggle-indicator" aria-hidden="true"></span></button><h2 class="hndle ui-sortable-handle"><span>[--list_title--]</span></h2>
-            <div class="inside">
-                <button class="add-list-elem" id="remote_list_elem_[--list_counter--]">Añadir Elemento</button>
-            </div>
-            <button class="remove-list" id="remove_list_[--list_counter--]">Eliminar Lista</button>
-        </div>
-    </div>
-    <div id="list-elem-prototype" hidden>
-        <div>
-            <input type="text" name="list_elem_title_[--list_counter--]_[--list_elem_counter--]" />
-            <input type="textarea" name="list_elem_content_[--list_counter--]_[--list_elem_counter--]" />
-            <input type="text" name="list_elem_image_[--list_counter--]_[--list_elem_counter--]" />
-            <button class="remove-list-elem" id="remove_list_elem_[--list_counter--]_[--list_elem_counter--]">Eliminar Elemento</button>
-        </div>
-    </div>
-    <div id="beauty_list_element_0" class="postbox ">
-        <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Alternar panel: Lista 1</span><span class="toggle-indicator" aria-hidden="true"></span></button><h2 class="hndle"><span>Lista 1</span></h2>
-        <div class="inside">
-            <div>
-                <input type="text" name="list_elem_title_0_0" />
-                <input type="textarea" name="list_elem_content_0_0" />
-                <input type="text" name="list_elem_image_0_0" />
-            </div>
-            <button class="add-list-elem" id="remote_list_elem_[--list_counter--]">Añadir Elemento</button>
-        </div>
-        <button class="remove-list" id="remove_list_0">Eliminar Lista</button>
-    </div>
-';
-}*/
+    $metadatas = array();
+    foreach ($metadataNames as $metadataName) {
+        $metadatas[$metadataName] = get_post_meta($post->ID, $metadataName, true);
+    }
+    return $metadatas;
+}
 
+function save_beauty_list_data($post_id, $post, $update)
+{
+    reset_log_in_file();
+    if (!isset($_POST["meta-box-nonce"]) || !wp_verify_nonce($_POST["meta-box-nonce"], basename(__FILE__))) {
+        return $post_id;
+    }
+
+    if(!current_user_can("edit_post", $post_id)) {
+        return $post_id;
+    }
+
+    if(defined("DOING_AUTOSAVE") && DOING_AUTOSAVE) {
+        return $post_id;
+    }
+
+    $slug = "post";
+    if($slug != $post->post_type) {
+        return $post_id;
+    }
+
+    $i=0;
+    while (isset($_POST['list_elem_title_'.$i]) || isset($_POST['list_elem_content_'.$i]) || isset($_POST['list_elem_image_'.$i])) {
+        $meta_box_title_value = "";
+        $meta_box_content_value = "";
+        $meta_box_image_value = "";
+
+        if (isset($_POST['list_elem_title_'.$i])) {
+            $meta_box_title_value = $_POST['list_elem_title_'.$i];
+        }
+
+        if (isset($_POST['list_elem_content_'.$i])) {
+            $meta_box_content_value = $_POST['list_elem_content_'.$i];
+        }
+
+        if (isset($_POST['list_elem_image_'.$i])) {
+            $meta_box_image_value = $_POST['list_elem_image_'.$i];
+        }
+
+        if (strlen($meta_box_title_value) > 0) {
+            update_post_meta($post_id, "list_elem_title_".$i, $meta_box_title_value);
+        } elseif (!empty(get_post_meta($post_id, "list_elem_title_".$i, true))) {
+            delete_post_meta($post_id, "list_elem_title_".$i);
+        }
+        if (strlen($meta_box_content_value) > 0) {
+            update_post_meta($post_id, "list_elem_content_".$i, $meta_box_content_value);
+        } elseif (!empty(get_post_meta($post_id, "list_elem_content_".$i, true))) {
+            delete_post_meta($post_id, "list_elem_content_".$i);
+        }
+        if (strlen($meta_box_image_value) > 0) {
+            update_post_meta($post_id, "list_elem_image_".$i, $meta_box_image_value);
+        } elseif (!empty(get_post_meta($post_id, "list_elem_image_".$i, true))) {
+            delete_post_meta($post_id, "list_elem_image_".$i);
+        }
+
+        $i++;
+    }
+}
+
+function insert_beauty_list($content)
+{
+    if (strpos($content, "[&#8211; beauty_list &#8211;]") !== false) {
+        $data = [];
+        $i = 0;
+
+        $elemTitle = get_post_meta($GLOBALS['post']->ID, "list_elem_title_".$i, true);
+        $elemContent = get_post_meta($GLOBALS['post']->ID, "list_elem_content_".$i, true);
+        $elemImage = get_post_meta($GLOBALS['post']->ID, "list_elem_image_".$i, true);
+        while (
+            strlen($elemTitle) > 0
+            || strlen($elemContent) > 0
+            || strlen($elemImage) > 0
+        ) {
+            if (strlen($elemTitle) > 0) {
+                $data[$i]['title'] = $elemTitle;
+            }
+            if (strlen($elemContent) > 0) {
+                $data[$i]['content'] = $elemContent;
+            }
+            if (strlen($elemImage) > 0) {
+                $data[$i]['image'] = $elemImage;
+            }
+            $i++;
+            $elemTitle = get_post_meta($GLOBALS['post']->ID, "list_elem_title_".$i, true);
+            $elemContent = get_post_meta($GLOBALS['post']->ID, "list_elem_content_".$i, true);
+            $elemImage = get_post_meta($GLOBALS['post']->ID, "list_elem_image_".$i, true);
+        }
+
+        return str_replace("[&#8211; beauty_list &#8211;]", generateBeautyList($data), $content);
+    }
+    return $content;
+}
+
+function generateBeautyList($list)
+{
+    $listHTML = "
+        <style>
+            #beauty-list .list-elem-col.left {float: left;}
+            #beauty-list .list-elem-col.right {float: right;}
+            #beauty-list .list-image {width: 100%; margin-top: 0px;}
+            #beauty-list .list-number {margin-left: -40px; font-size: 60px;}
+            #beauty-list .list-elem-div {padding-left: 40px; margin-top: 40px; display:block}
+            #beauty-list .list-info {margin-top: -60px;}
+        </style>
+    ";
+    $listHTML .= '<div id="beauty-list">';
+    $i=0;
+    foreach ($list as $elem) {
+        $listHTML .= '
+            <div class="vc_row wpb_row vc_row-fluid custom-beauty-list-row">
+        ';
+        $side = ($i%2==0) ? "left" : "right";
+        $listHTML .= '
+                <div class="wpb_column vc_column_container vc_col-sm-6 list-elem-col '.$side.'">
+                    <div class="vc_column-inner list-elem-div">
+                        <img class="list-image" src="'.$elem['image'].'"/>
+                    </div>
+                </div>';
+        $side = ($i%2==0) ? "right" : "left";
+        $listHTML .= '
+                <div class="wpb_column vc_column_container vc_col-sm-6 list-elem-col '.$side.'">
+                    <div class="vc_column-inner list-elem-div">
+                        <span class="list-number">'.($i+1).'</span>
+                        <div class="list-info">';
+        if (isset($elem['title'])) {
+            $listHTML .=    '<h3 class="list-title">'.$elem['title'].'</h3>';
+        }
+        if (isset($elem['content'])) {
+            $listHTML .=    '<div class="list-content"><p>'.implode("</p><p>", explode("\n", $elem['content'])).'</p></div>';
+        }
+        $listHTML .= '
+                        </div>
+                    </div>
+                </div>
+            </div>';
+        $i++;
+    }
+    $listHTML .= '</div>';
+
+    return $listHTML;
+}
+
+function log_in_file($key, $element)
+{
+    file_put_contents("/tmp/beauty_list_log.php", $key.": ", FILE_APPEND);
+    file_put_contents("/tmp/beauty_list_log.php", print_r($element, true)."\n", FILE_APPEND);
+}
+
+function reset_log_in_file()
+{
+    file_put_contents("/tmp/beauty_list_log.php", "");
+}
+
+function js_composer_front_load() {
+    if(is_single()) {
+        wp_enqueue_style('js_composer_front');
+    }
+}
+
+add_action('wp_enqueue_scripts', 'js_composer_front_load');
 add_action("add_meta_boxes", "add_beauty_list");
+add_action("save_post", "save_beauty_list_data", 10, 3);
+add_filter("the_content", "insert_beauty_list");
