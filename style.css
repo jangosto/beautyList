@@ -1,16 +1,8 @@
-#beauty_list .inside {overflow:auto;}
-#beauty_list .list-elem-container {width:45%;margin-top:10px;margin-bottom:10px;border-style:dotted;padding:10px 10px 10px 10px;}
-#beauty_list .list-elem-container .input, .list-elem-container label {display:block;}
-#beauty_list .list-elem-container .input {width:100%;}
-#beauty_list .list-elem-container.right {float:right;}
-#beauty_list .list-elem-container.left {float:left;}
-#beauty_list .info-container {text-align:center;border-style:dotted; padding:10px 10px 10px 10px;}
-
 #beauty-list .custom-beauty-list-row {margin-top: 40px;}
 #beauty-list .list-elem-part.left {float: left;}
 #beauty-list .list-elem-part.right {float: right;}
 #beauty-list .list-elem-part {width: 50%;}
-#beauty-list .list-image {/*padding-left: 20px; padding-right: 20px;*/ margin-top: 12px;}
+#beauty-list .list-image {padding-left: 20px; padding-right: 20px; margin-top: 12px;}
 #beauty-list .list-number {margin-left: -40px; font-size: 100px;}
 #beauty-list .list-content {padding-left: 20px; padding-right: 20px; margin-top: 40px;}
 #beauty-list .list-counter {padding-left: 60px;}

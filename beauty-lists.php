@@ -26,6 +26,18 @@ function add_beauty_list_in_form($post, $metabox)
 
     $maxListElements = 10;
     echo '
+        <style>
+            #beauty_list .inside {overflow:auto;}
+            #beauty_list .list-elem-container {width:45%;margin-top:10px;margin-bottom:10px;border-style:dotted;padding:10px 10px 10px 10px;}
+            #beauty_list .list-elem-container .input, .list-elem-container label {display:block;}
+            #beauty_list .list-elem-container .input {width:100%;}
+            #beauty_list .list-elem-container.right {float:right;}
+            #beauty_list .list-elem-container.left {float:left;}
+            #beauty_list .info-container {text-align:center;border-style:dotted; padding:10px 10px 10px 10px;}
+        </style>
+    ';
+
+    echo '
         <div class="info-container">
             Añade el código <strong>[-- beauty_list --]</strong> en el lugar donde quieres que se pinte esta lista.
         </div>
@@ -194,8 +206,12 @@ function reset_log_in_file()
 }
 
 function js_composer_front_load() {
-    if(is_single()) {
+    if (is_single()) {
         wp_enqueue_style('js_composer_front');
+        wp_enqueue_style('beauty_list', '/wp-content/plugins/beauty-lists/style.css');
+    }
+
+    if (is_admin()) {
         wp_enqueue_style('beauty_list', '/wp-content/plugins/beauty-lists/style.css');
     }
 }
