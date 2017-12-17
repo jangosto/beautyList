@@ -25,15 +25,6 @@ function add_beauty_list_in_form($post, $metabox)
     wp_nonce_field(basename(__FILE__), "meta-box-nonce");
 
     $maxListElements = 10;
-    echo '<style>
-            #beauty_list .inside {overflow:auto;}
-            #beauty_list .list-elem-container {width:45%;margin-top:10px;margin-bottom:10px;border-style:dotted;padding:10px 10px 10px 10px;}
-            #beauty_list .list-elem-container .input, .list-elem-container label {display:block;}
-            #beauty_list .list-elem-container .input {width:100%;}
-            #beauty_list .list-elem-container.right {float:right;}
-            #beauty_list .list-elem-container.left {float:left;}
-            #beauty_list .info-container {text-align:center;border-style:dotted; padding:10px 10px 10px 10px;}
-        </style>';
     echo '
         <div class="info-container">
             Añade el código <strong>[-- beauty_list --]</strong> en el lugar donde quieres que se pinte esta lista.
@@ -158,45 +149,31 @@ function insert_beauty_list($content)
 
 function generateBeautyList($list)
 {
-    $listHTML = "
-        <style>
-            #beauty-list .list-elem-col.left {float: left;}
-            #beauty-list .list-elem-col.right {float: right;}
-            #beauty-list .list-image {width: 100%; margin-top: 0px;}
-            #beauty-list .list-number {margin-left: -40px; font-size: 60px;}
-            #beauty-list .list-elem-div {padding-left: 40px; margin-top: 40px; display:block}
-            #beauty-list .list-info {margin-top: -60px;}
-        </style>
-    ";
     $listHTML .= '<div id="beauty-list">';
     $i=0;
     foreach ($list as $elem) {
         $listHTML .= '
             <div class="vc_row wpb_row vc_row-fluid custom-beauty-list-row">
         ';
-        $side = ($i%2==0) ? "left" : "right";
+        $imageSide = ($i%2==0) ? "left" : "right";
+        $textSide = ($i%2==0) ? "right" : "left"; 
         $listHTML .= '
-                <div class="wpb_column vc_column_container vc_col-sm-6 list-elem-col '.$side.'">
-                    <div class="vc_column-inner list-elem-div">
-                        <img class="list-image" src="'.$elem['image'].'"/>
-                    </div>
-                </div>';
-        $side = ($i%2==0) ? "right" : "left";
-        $listHTML .= '
-                <div class="wpb_column vc_column_container vc_col-sm-6 list-elem-col '.$side.'">
-                    <div class="vc_column-inner list-elem-div">
-                        <span class="list-number">'.($i+1).'</span>
-                        <div class="list-info">';
+                <div class="list-elem-part list-counter '.$textSide.'">
+                    <span class="list-number">'.($i+1).'</span>
+        ';
         if (isset($elem['title'])) {
-            $listHTML .=    '<h3 class="list-title">'.$elem['title'].'</h3>';
-        }
-        if (isset($elem['content'])) {
-            $listHTML .=    '<div class="list-content"><p>'.implode("</p><p>", explode("\n", $elem['content'])).'</p></div>';
+            $listHTML .= '
+                    <h3 class="list-title">'.$elem['title'].'</h3>';
         }
         $listHTML .= '
-                        </div>
-                    </div>
                 </div>
+                <img class="list-image list-elem-part '.$imageSide.'" src="'.$elem['image'].'"/>
+        ';
+        if (isset($elem['content'])) {
+            $listHTML .= '
+                <div class="list-content list-elem-part '.$textSide.'"><p>'.implode("</p><p>", explode("\n", $elem['content'])).'</p></div>';
+        }
+        $listHTML .= '
             </div>';
         $i++;
     }
@@ -219,10 +196,13 @@ function reset_log_in_file()
 function js_composer_front_load() {
     if(is_single()) {
         wp_enqueue_style('js_composer_front');
+        wp_enqueue_style('beauty_list', '/wp-content/plugins/beauty-lists/style.css');
     }
 }
 
 add_action('wp_enqueue_scripts', 'js_composer_front_load');
 add_action("add_meta_boxes", "add_beauty_list");
 add_action("save_post", "save_beauty_list_data", 10, 3);
+add_action( 'wp_print_styles', 'enqueue_my_styles' );
+
 add_filter("the_content", "insert_beauty_list");
