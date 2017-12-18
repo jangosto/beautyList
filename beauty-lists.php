@@ -34,12 +34,13 @@ function add_beauty_list_in_form($post, $metabox)
             #beauty_list .list-elem-container.right {float:right;}
             #beauty_list .list-elem-container.left {float:left;}
             #beauty_list .info-container {text-align:center;border-style:dotted; padding:10px 10px 10px 10px;}
+            #beauty_list .info-container .adding-tag {font-size: 20px;}
         </style>
     ';
 
     echo '
         <div class="info-container">
-            Añade el código <strong>[-- beauty_list --]</strong> en el lugar donde quieres que se pinte esta lista.
+            Añade el código <strong class="adding-tag">[-- beauty_list --]</strong> en el lugar donde quieres que se pinte esta lista.
         </div>
     ';
     for ($i=0;$i<$maxListElements;$i++) {
