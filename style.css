@@ -2,7 +2,7 @@
 #beauty-list .list-elem-part.left {float: left;}
 #beauty-list .list-elem-part.right {float: right;}
 #beauty-list .list-elem-part {width: 50%;}
-#beauty-list .list-image {padding-left: 20px; padding-right: 20px; margin-top: 12px;}
+#beauty-list .list-image {padding: 20px 20px 20px 20px; margin-top: 12px;}
 #beauty-list .list-number {margin-left: -40px; font-size: 100px;}
 #beauty-list .list-content {padding-left: 20px; padding-right: 20px; margin-top: 40px;}
 #beauty-list .list-counter {padding-left: 60px;}
