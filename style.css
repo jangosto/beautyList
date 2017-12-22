@@ -6,7 +6,7 @@
 #beauty-list .list-number {margin-left: -40px; font-size: 100px;}
 #beauty-list .list-content {padding-left: 20px; padding-right: 20px; margin-top: 40px;}
 #beauty-list .list-counter {padding-left: 60px;}
-#beauty-list .list-title {margin-top: -25px; font-size: 20px; margin-left: 40px;}
+#beauty-list .list-title {margin-top: -25px; font-size: 20px; margin-left: 40px; text-align: left;}
 
 @media (max-width: 767px) {
     #beauty-list .list-elem-part.left {float: none;}
