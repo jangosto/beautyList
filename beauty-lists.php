@@ -176,7 +176,7 @@ function generateBeautyList($list)
         ';
         if (isset($elem['title'])) {
             $listHTML .= '
-                    <h3 class="list-title">'.$elem['title'].'</h3>';
+                    <h2 class="list-title">'.$elem['title'].'</h2>';
         }
         $listHTML .= '
                 </div>
