@@ -34,12 +34,13 @@ function add_beauty_list_in_form($post, $metabox)
             #beauty_list .list-elem-container.right {float:right;}
             #beauty_list .list-elem-container.left {float:left;}
             #beauty_list .info-container {text-align:center;border-style:dotted; padding:10px 10px 10px 10px;}
+            #beauty_list .info-container .adding-tag {font-size: 20px;}
         </style>
     ';
 
     echo '
         <div class="info-container">
-            Añade el código <strong>[-- beauty_list --]</strong> en el lugar donde quieres que se pinte esta lista.
+            Añade el código <strong class="adding-tag">[-- beauty_list --]</strong> en el lugar donde quieres que se pinte esta lista.
         </div>
     ';
     for ($i=0;$i<$maxListElements;$i++) {
@@ -175,15 +176,17 @@ function generateBeautyList($list)
         ';
         if (isset($elem['title'])) {
             $listHTML .= '
-                    <h3 class="list-title">'.$elem['title'].'</h3>';
+                    <h2 class="list-title">'.$elem['title'].'</h2>';
         }
         $listHTML .= '
                 </div>
                 <img class="list-image list-elem-part '.$imageSide.'" src="'.$elem['image'].'"/>
         ';
         if (isset($elem['content'])) {
+            /*$listHTML .= '
+                <div class="list-content list-elem-part '.$textSide.'"><p>'.implode("</p><p>", explode("\n", $elem['content'])).'</p></div>';*/
             $listHTML .= '
-                <div class="list-content list-elem-part '.$textSide.'"><p>'.implode("</p><p>", explode("\n", $elem['content'])).'</p></div>';
+                <div class="list-content list-elem-part '.$textSide.'">'.$elem['content'].'</div>';
         }
         $listHTML .= '
             </div>';
@@ -219,6 +222,5 @@ function js_composer_front_load() {
 add_action('wp_enqueue_scripts', 'js_composer_front_load');
 add_action("add_meta_boxes", "add_beauty_list");
 add_action("save_post", "save_beauty_list_data", 10, 3);
-add_action( 'wp_print_styles', 'enqueue_my_styles' );
 
 add_filter("the_content", "insert_beauty_list");
